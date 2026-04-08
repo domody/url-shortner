@@ -9,38 +9,48 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 
-const tempContent = [
+
+
+type Stats = {
+    total_links: number;
+    total_clicks: number;
+    todays_clicks: number;
+    recent: Click[];
+};
+
+export default function Dashboard({ stats }: { stats: Stats }) {
+
+    const statCards = [
     {
         title: 'Total Links',
-        value: 1284,
+        value: stats.total_links,
     },
     {
         title: 'Total Clicks',
-        value: 42785,
+        value: stats.total_clicks,
     },
     {
         title: 'Clicks Today',
-        value: 892,
+        value: stats.todays_clicks,
     },
 ];
 
-export default function Dashboard() {
     return (
         <>
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                    {tempContent.map((item) => {
+                    {statCards.map((stat) => {
                         return (
-                            <Card key={item.title}>
+                            <Card key={stat.title}>
                                 {/* <CardHeader></CardHeader> */}
                                 <CardContent>
                                     <div className="flex flex-col gap-1">
                                         <CardDescription>
-                                            {item.title}
+                                            {stat.title}
                                         </CardDescription>
                                         <CardTitle className="text-4xl font-semibold">
-                                            {item.value}
+                                            {stat.value}
                                         </CardTitle>
                                     </div>
                                 </CardContent>
