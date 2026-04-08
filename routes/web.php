@@ -13,9 +13,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('links', [DashboardController::class, 'links'])->name('links');
     Route::get('links/{link}', [URLShortnerController::class, 'show'])->name('links.show');
-    Route::post('create', [URLShortnerController::class, 'create'])->name('links.create');
+    Route::post('create', [URLShortnerController::class, 'create'])->middleware('throttle:30,1')->name('links.create');
 });
 
-Route::get('/{code}', [URLShortnerController::class, 'redirect'])->name('short.redirect');
+Route::get('/{code}', [URLShortnerController::class, 'redirect'])->middleware('throttle:120,1')->name('short.redirect');
 
 require __DIR__.'/settings.php';

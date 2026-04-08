@@ -5,7 +5,6 @@ import {
     Check,
     ExternalLink,
     LinkIcon,
-    ArrowUpRight,
 } from 'lucide-react';
 import { dashboard, links as linksRoute } from '@/routes';
 import {
@@ -16,13 +15,6 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
