@@ -13,7 +13,7 @@ class URLShortnerController extends Controller
     public function create(Request $request)
     {
         $validated = $request->validate([
-            'original_url' => ['required', 'url', 'max:2048'],
+            'original_url' => ['required', 'url:http,https', 'max:2048'],
             'code'         => ['nullable', 'string', 'alpha_dash', 'max:32', 'unique:links,code'],
         ]);
 
@@ -26,7 +26,7 @@ class URLShortnerController extends Controller
 
         Link::create($validated);
 
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Link created.');
     }
 
     public function show(Link $link)
@@ -53,7 +53,7 @@ class URLShortnerController extends Controller
             'link_id' => $link->id,
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
-            'referrer' => $request->headers->get('referer'), # whichever idiot misspelled this can genuinely blow one
+            'referrer' => $request->headers->get('referer'),
         ]);
 
         return redirect()->away($link->original_url, 302);
