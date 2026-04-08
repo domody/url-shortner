@@ -29,6 +29,22 @@ class URLShortnerController extends Controller
         return redirect()->back();
     }
 
+    public function show(Link $link)
+    {
+        $user = Auth::user();
+
+        $link = Link::where('id', $link->id)
+            ->where('user_id', $user->id)
+            ->withCount('clicks')
+            ->with(['clicks' => fn ($q) => $q->latest()])
+            ->latest()
+            ->firstOrFail();
+
+        return inertia('app/links/show', [
+            'link' => $link,
+        ]);
+    }
+
     public function redirect(Request $request, string $code)
     {
         $link = Link::where('code', $code)->firstOrFail();

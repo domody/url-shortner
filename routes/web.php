@@ -12,6 +12,7 @@ Route::inertia('/', 'public/landing', [
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('links', [DashboardController::class, 'links'])->name('links');
+    Route::get('links/{link}', [URLShortnerController::class, 'show'])->name('links.show');
     Route::post('create', [URLShortnerController::class, 'create'])->name('links.create');
 });
 
