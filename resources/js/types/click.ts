@@ -6,4 +6,5 @@ type Click = {
     ip_address: string;
     referrer: string;
     user_agent: string;
+    created_at: string;
 }
