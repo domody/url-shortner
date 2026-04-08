@@ -8,8 +8,14 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-
-
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 
 type Stats = {
     total_links: number;
@@ -19,21 +25,20 @@ type Stats = {
 };
 
 export default function Dashboard({ stats }: { stats: Stats }) {
-
     const statCards = [
-    {
-        title: 'Total Links',
-        value: stats.total_links,
-    },
-    {
-        title: 'Total Clicks',
-        value: stats.total_clicks,
-    },
-    {
-        title: 'Clicks Today',
-        value: stats.todays_clicks,
-    },
-];
+        {
+            title: 'Total Links',
+            value: stats.total_links,
+        },
+        {
+            title: 'Total Clicks',
+            value: stats.total_clicks,
+        },
+        {
+            title: 'Clicks Today',
+            value: stats.todays_clicks,
+        },
+    ];
 
     return (
         <>
@@ -58,12 +63,64 @@ export default function Dashboard({ stats }: { stats: Stats }) {
                         );
                     })}
                 </div>
-                <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                    <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                </div>
+                <Card className="overflow-hidden">
+                    <CardHeader>
+                        <CardTitle>Recent Clicks</CardTitle>
+                        <CardDescription>The latest activity across your shortened links.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                        <Table>
+                            <TableHeader>
+                                <TableRow className="hover:bg-transparent">
+                                    <TableHead className="pl-6">Short URL</TableHead>
+                                    <TableHead>Referrer</TableHead>
+                                    <TableHead>User Agent</TableHead>
+                                    <TableHead className="pr-6 text-right">Created</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {stats.recent.map((link) => (
+                                    <TableRow
+                                        key={link.id}
+                                        className="group/row cursor-pointer"
+                                        // onClick={() =>
+                                        //     router.visit(`/links/${link.id}`)
+                                        // }
+                                    >
+                                        <TableCell className="pl-6">
+                                            <span className="font-mono font-medium text-foreground">
+                                                {link.link_id}
+                                            </span>
+                                        </TableCell>
+
+                                        <TableCell className="text-muted-foreground">
+                                            {link.referrer ?? 'No referrer'}
+                                        </TableCell>
+
+                                        <TableCell className="max-w-[240px] truncate text-muted-foreground">
+                                            {link.user_agent}
+                                        </TableCell>
+
+                                        <TableCell className="pr-6 text-right text-muted-foreground">
+                                            {formatDate(link.created_at)}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
             </div>
         </>
     );
+}
+
+function formatDate(iso: string) {
+    return new Date(iso).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+    });
 }
 
 Dashboard.layout = {
