@@ -22,6 +22,7 @@ class DashboardController extends Controller
                                         ->whereDate('created_at', today())
                                         ->count(),
                 'recent'        => Click::whereHas('link', fn($q) => $q->where('user_id', $user->id))
+                                        ->with('link')
                                         ->latest()
                                         ->take(5)
                                         ->get(),

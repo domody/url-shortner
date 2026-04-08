@@ -1,5 +1,4 @@
-import { Head } from '@inertiajs/react';
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import { Head, router } from '@inertiajs/react';
 import { dashboard } from '@/routes';
 import {
     Card,
@@ -48,7 +47,6 @@ export default function Dashboard({ stats }: { stats: Stats }) {
                     {statCards.map((stat) => {
                         return (
                             <Card key={stat.title}>
-                                {/* <CardHeader></CardHeader> */}
                                 <CardContent>
                                     <div className="flex flex-col gap-1">
                                         <CardDescription>
@@ -66,16 +64,22 @@ export default function Dashboard({ stats }: { stats: Stats }) {
                 <Card className="overflow-hidden">
                     <CardHeader>
                         <CardTitle>Recent Clicks</CardTitle>
-                        <CardDescription>The latest activity across your shortened links.</CardDescription>
+                        <CardDescription>
+                            The latest activity across your shortened links.
+                        </CardDescription>
                     </CardHeader>
                     <CardContent className="p-0">
                         <Table>
                             <TableHeader>
                                 <TableRow className="hover:bg-transparent">
-                                    <TableHead className="pl-6">Short URL</TableHead>
+                                    <TableHead className="pl-6">
+                                        Short URL
+                                    </TableHead>
                                     <TableHead>Referrer</TableHead>
                                     <TableHead>User Agent</TableHead>
-                                    <TableHead className="pr-6 text-right">Created</TableHead>
+                                    <TableHead className="pr-6 text-right">
+                                        Created
+                                    </TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -83,13 +87,16 @@ export default function Dashboard({ stats }: { stats: Stats }) {
                                     <TableRow
                                         key={link.id}
                                         className="group/row cursor-pointer"
-                                        // onClick={() =>
-                                        //     router.visit(`/links/${link.id}`)
-                                        // }
+                                        onClick={() =>
+                                            router.visit(
+                                                `/links/${link.link_id}`,
+                                            )
+                                        }
                                     >
                                         <TableCell className="pl-6">
                                             <span className="font-mono font-medium text-foreground">
-                                                {link.link_id}
+                                                {link.link?.code ??
+                                                    link.link_id}
                                             </span>
                                         </TableCell>
 
