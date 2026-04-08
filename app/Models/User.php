@@ -23,6 +23,11 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
+    public function links()
+    {
+        return $this->hasMany(Links::class);
+    }
+
     protected function casts(): array
     {
         return [
