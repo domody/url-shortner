@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Clicks;
-use App\Models\Links;
+use App\Models\Click;
+use App\Models\Link;
 use Illuminate\Database\Seeder;
 
 class ClickSeeder extends Seeder
@@ -37,14 +37,14 @@ class ClickSeeder extends Seeder
 
     public function run(): void
     {
-        $links = Links::all();
+        $links = Link::all();
 
         foreach ($links as $link) {
             // Realistic distribution: most links get a few clicks, some get many
             $clickCount = $this->realisticClickCount();
 
             for ($i = 0; $i < $clickCount; $i++) {
-                Clicks::create([
+                Click::create([
                     'link_id' => $link->id,
                     'ip_address' => fake()->ipv4(),
                     'referrer' => $this->referrers[array_rand($this->referrers)],

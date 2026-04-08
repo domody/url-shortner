@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-class LinksFactory extends Factory
+class LinkFactory extends Factory
 {
     public function definition(): array
     {

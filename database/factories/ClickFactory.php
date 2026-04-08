@@ -2,10 +2,10 @@
 
 namespace Database\Factories;
 
-use App\Models\Links;
+use App\Models\Link;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class ClicksFactory extends Factory
+class ClickFactory extends Factory
 {
     private static array $userAgents = [
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
@@ -37,7 +37,7 @@ class ClicksFactory extends Factory
     public function definition(): array
     {
         return [
-            'link_id' => Links::factory(),
+            'link_id' => Link::factory(),
             'ip_address' => $this->faker->ipv4(),
             'referrer' => $this->faker->randomElement(self::$referrers),
             'user_agent' => $this->faker->randomElement(self::$userAgents),

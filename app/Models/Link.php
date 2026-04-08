@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Links extends Model
+class Link extends Model
 {
     use HasFactory;
 
@@ -22,6 +22,6 @@ class Links extends Model
 
     public function clicks()
     {
-        return $this->hasMany(Clicks::class);
+        return $this->hasMany(Click::class);
     }
 }

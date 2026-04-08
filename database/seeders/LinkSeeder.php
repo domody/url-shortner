@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Links;
+use App\Models\Link;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -40,7 +40,7 @@ class LinkSeeder extends Seeder
             $linkCount = rand(5, 15);
 
             for ($i = 0; $i < $linkCount; $i++) {
-                Links::create([
+                Link::create([
                     'user_id' => $user->id,
                     'original_url' => $urls[array_rand($urls)],
                     'code' => Str::random(6),

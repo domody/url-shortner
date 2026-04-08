@@ -25,7 +25,7 @@ class User extends Authenticatable
      */
     public function links()
     {
-        return $this->hasMany(Links::class);
+        return $this->hasMany(Link::class);
     }
 
     protected function casts(): array
