@@ -1,18 +1,13 @@
 import { Head, router } from '@inertiajs/react';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import {
-    ArrowLeft,
-    Check,
-    Copy,
     ExternalLink,
-    MousePointerClick,
-    TrendingUp,
-    CalendarDays,
-    Clock,
     Globe,
     MousePointerClickIcon,
     LucideIcon,
     Logs,
+    EditIcon,
+    Trash2Icon,
 } from 'lucide-react';
 import {
     Card,
@@ -22,7 +17,6 @@ import {
     CardDescription,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
     Table,
     TableBody,
@@ -32,22 +26,25 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { dashboard, links as linksRoute } from '@/routes';
-import {
-    ChartConfig,
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent,
-} from '@/components/ui/chart';
-import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
 import { Progress } from '@/components/ui/progress';
 import {
     Empty,
-    EmptyContent,
     EmptyDescription,
     EmptyHeader,
     EmptyMedia,
     EmptyTitle,
 } from '@/components/ui/empty';
+import {
+    formatDate,
+    formatRelative,
+    parseUserAgent,
+    formatReferrer,
+} from '@/lib/helpers';
+import { CopyButton } from '@/components/copy-button';
+import { ActivityChart } from '@/components/activity-chart';
+import { StatCard } from '@/components/stat-card';
+import { Button } from '@/components/ui/button';
+import { DeleteLink } from '@/components/delete-link';
 
 type ClickItem = {
     id: number;
@@ -68,95 +65,6 @@ type LinkItem = {
     created_at: string;
     updated_at: string;
 };
-
-function formatDate(iso: string) {
-    return new Date(iso).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-    });
-}
-
-function formatRelative(iso: string) {
-    const diff = Date.now() - new Date(iso).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 1) return 'Just now';
-    if (mins < 60) return `${mins}m ago`;
-    const hrs = Math.floor(mins / 60);
-    if (hrs < 24) return `${hrs}h ago`;
-    const days = Math.floor(hrs / 24);
-    return `${days}d ago`;
-}
-
-function parseUserAgent(ua: string | null): { browser: string; os: string } {
-    if (!ua) return { browser: 'Unknown', os: 'Unknown' };
-    let browser = 'Other';
-    if (/Edg\//.test(ua)) browser = 'Edge';
-    else if (/OPR\//.test(ua)) browser = 'Opera';
-    else if (/Chrome\//.test(ua) && !/Chromium/.test(ua)) browser = 'Chrome';
-    else if (/Firefox\//.test(ua)) browser = 'Firefox';
-    else if (/Safari\//.test(ua) && !/Chrome/.test(ua)) browser = 'Safari';
-    else if (/curl\//.test(ua)) browser = 'cURL';
-    let os = 'Other';
-    if (/Windows/.test(ua)) os = 'Windows';
-    else if (/iPhone|iPad/.test(ua)) os = 'iOS';
-    else if (/Mac OS X/.test(ua)) os = 'macOS';
-    else if (/Android/.test(ua)) os = 'Android';
-    else if (/Linux/.test(ua)) os = 'Linux';
-    return { browser, os };
-}
-
-function formatReferrer(ref: string | null): string {
-    if (!ref) return 'Direct';
-    try {
-        const { hostname } = new URL(ref);
-        return hostname.replace(/^www\./, '');
-    } catch {
-        return ref;
-    }
-}
-
-function CopyButton({ text, label }: { text: string; label?: string }) {
-    const [copied, setCopied] = useState(false);
-
-    const handleCopy = () => {
-        if (navigator.clipboard?.writeText) {
-            navigator.clipboard.writeText(text).then(() => {
-                setCopied(true);
-                setTimeout(() => setCopied(false), 1800);
-            });
-        } else {
-            const ta = document.createElement('textarea');
-            ta.value = text;
-            ta.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
-            document.body.appendChild(ta);
-            ta.select();
-            try {
-                document.execCommand('copy');
-                setCopied(true);
-                setTimeout(() => setCopied(false), 1800);
-            } finally {
-                document.body.removeChild(ta);
-            }
-        }
-    };
-
-    return (
-        <Button
-            variant="outline"
-            size="sm"
-            onClick={handleCopy}
-            className="h-8 gap-1.5 text-xs"
-        >
-            {copied ? (
-                <Check className="h-3 w-3 text-emerald-500" />
-            ) : (
-                <Copy className="h-3 w-3" />
-            )}
-            {label && <span>{copied ? 'Copied!' : label}</span>}
-        </Button>
-    );
-}
 
 // Reusable empty state
 
@@ -179,99 +87,6 @@ function EmptyState({
                 <EmptyDescription>{description}</EmptyDescription>
             </EmptyHeader>
         </Empty>
-    );
-}
-
-// Activity chart
-
-const chartConfig = {
-    count: {
-        label: 'Count',
-        color: 'var(--chart-4)',
-    },
-} satisfies ChartConfig;
-
-function ActivityChart({ clicks }: { clicks: ClickItem[] }) {
-    const days = useMemo(() => {
-        const arr: string[] = [];
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        for (let i = 29; i >= 0; i--) {
-            const d = new Date(today);
-            d.setDate(d.getDate() - i + 1);
-            arr.push(d.toISOString().split('T')[0]);
-        }
-        const counts: Record<string, number> = {};
-        clicks.forEach((c) => {
-            const day = new Date(c.created_at).toISOString().split('T')[0];
-            counts[day] = (counts[day] ?? 0) + 1;
-        });
-        return arr.map((date, i) => ({
-            date: new Date(date + 'T12:00:00').toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-            }),
-            count: counts[date] ?? 0,
-        }));
-    }, [clicks]);
-
-    return (
-        <ChartContainer config={chartConfig} className="h-[300px] w-full">
-            <BarChart accessibilityLayer data={days}>
-                <CartesianGrid vertical={false} />
-                <XAxis
-                    dataKey={'date'}
-                    tickLine={false}
-                    tickMargin={10}
-                    axisLine={false}
-                />
-                <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent hideLabel />}
-                />
-                <Bar dataKey="count" fill="var(--color-count)" radius={0} />
-            </BarChart>
-        </ChartContainer>
-    );
-}
-
-// Stat card
-
-function StatCard({
-    label,
-    value,
-    sub,
-    accent,
-}: {
-    label: string;
-    value: string | number;
-    sub?: string;
-    accent?: string;
-}) {
-    return (
-        <Card>
-            <CardContent>
-                <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                            {label}
-                        </p>
-                        <p
-                            className={`text-3xl font-semibold tracking-tight tabular-nums ${accent ?? ''}`}
-                        >
-                            {typeof value === 'number'
-                                ? value.toLocaleString()
-                                : value}
-                        </p>
-                        {sub && (
-                            <p className="text-xs text-muted-foreground">
-                                {sub}
-                            </p>
-                        )}
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
     );
 }
 
@@ -350,6 +165,10 @@ export default function LinkShow({ link }: { link: LinkItem }) {
 
                     <div className="flex shrink-0 items-center gap-2">
                         <CopyButton text={shortUrl} label="Copy link" />
+                        <Button variant={'outline'} size={'icon'}>
+                            <EditIcon />
+                        </Button>
+                        <DeleteLink link={link} />
                     </div>
                 </div>
 

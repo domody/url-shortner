@@ -6,6 +6,7 @@ import {
     ExternalLink,
     LinkIcon,
 } from 'lucide-react';
+import { formatDate } from '@/lib/helpers';
 import { dashboard, links as linksRoute } from '@/routes';
 import {
     Table,
@@ -70,14 +71,6 @@ function CopyButton({ text }: { text: string }) {
             )}
         </Button>
     );
-}
-
-function formatDate(iso: string) {
-    return new Date(iso).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-    });
 }
 
 function truncateUrl(url: string, max = 52) {

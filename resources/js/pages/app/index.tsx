@@ -1,4 +1,5 @@
 import { Head, router } from '@inertiajs/react';
+import { formatDate } from '@/lib/helpers';
 import { dashboard } from '@/routes';
 import {
     Card,
@@ -120,14 +121,6 @@ export default function Dashboard({ stats }: { stats: Stats }) {
             </div>
         </>
     );
-}
-
-function formatDate(iso: string) {
-    return new Date(iso).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-    });
 }
 
 Dashboard.layout = {
