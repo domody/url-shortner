@@ -58,4 +58,11 @@ class URLShortnerController extends Controller
 
         return redirect()->away($link->original_url, 302);
     }
+
+    public function destroy(Link $link)
+    {
+        $link->delete();
+
+        return redirect()->route('links')->with('success', 'Short URL deleted.');
+    }
 }
