@@ -2,7 +2,7 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "domody/url-shortner",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "A URL shortening service with click analytics.",
     "keywords": [
         "laravel",
         "framework"
