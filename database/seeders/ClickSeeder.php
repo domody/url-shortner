@@ -61,10 +61,10 @@ class ClickSeeder extends Seeder
         $roll = rand(1, 100);
 
         return match (true) {
-            $roll <= 40 => rand(1, 5),    // 40% of links: low traffic
-            $roll <= 70 => rand(6, 20),   // 30% of links: moderate traffic
-            $roll <= 90 => rand(21, 75),  // 20% of links: good traffic
-            default     => rand(76, 200), // 10% of links: viral/high traffic
+            $roll <= 40 => rand(3, 15),    // 40% of links: low traffic
+            $roll <= 70 => rand(16, 50),   // 30% of links: moderate traffic
+            $roll <= 90 => rand(51, 150),  // 20% of links: good traffic
+            default     => rand(151, 400), // 10% of links: viral/high traffic
         };
     }
 }

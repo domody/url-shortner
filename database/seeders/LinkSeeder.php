@@ -40,10 +40,14 @@ class LinkSeeder extends Seeder
             $linkCount = rand(5, 15);
 
             for ($i = 0; $i < $linkCount; $i++) {
+                $createdAt = fake()->dateTimeBetween('-1 month', 'now');
+
                 Link::create([
                     'user_id' => $user->id,
                     'original_url' => $urls[array_rand($urls)],
                     'code' => Str::random(6),
+                    'created_at' => $createdAt,
+                    'updated_at' => $createdAt,
                 ]);
             }
         }
