@@ -14,6 +14,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('links', [DashboardController::class, 'links'])->name('links');
     Route::get('links/{link}', [URLShortnerController::class, 'show'])->name('links.show');
     Route::post('create', [URLShortnerController::class, 'create'])->middleware('throttle:30,1')->name('links.create');
+    Route::put('links/{link}', [URLShortnerController::class, 'update'])->name('links.update');
     Route::delete('links/{link}', [URLShortnerController::class, 'destroy'])->name('links.destroy');
 });
 

@@ -59,6 +59,18 @@ class URLShortnerController extends Controller
         return redirect()->away($link->original_url, 302);
     }
 
+    public function update(Request $request, Link $link)
+    {
+        $validated = $request->validate([
+            'original_url' => ['required', 'url:http,https', 'max:2048'],
+            'code'         => ['nullable', 'string', 'alpha_dash', 'max:32', 'unique:links,code,' . $link->id],
+        ]);
+
+        $link->update($validated);
+
+        return redirect()->back()->with('success', 'Link updated.');
+    }
+
     public function destroy(Link $link)
     {
         $link->delete();

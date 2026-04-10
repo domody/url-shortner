@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { useMemo } from 'react';
 import {
     ExternalLink,
@@ -6,8 +6,6 @@ import {
     MousePointerClickIcon,
     LucideIcon,
     Logs,
-    EditIcon,
-    Trash2Icon,
 } from 'lucide-react';
 import {
     Card,
@@ -43,8 +41,8 @@ import {
 import { CopyButton } from '@/components/copy-button';
 import { ActivityChart } from '@/components/activity-chart';
 import { StatCard } from '@/components/stat-card';
-import { Button } from '@/components/ui/button';
 import { DeleteLink } from '@/components/delete-link';
+import { EditLink } from '@/components/edit-link';
 
 type ClickItem = {
     id: number;
@@ -165,9 +163,7 @@ export default function LinkShow({ link }: { link: LinkItem }) {
 
                     <div className="flex shrink-0 items-center gap-2">
                         <CopyButton text={shortUrl} label="Copy link" />
-                        <Button variant={'outline'} size={'icon'}>
-                            <EditIcon />
-                        </Button>
+                        <EditLink link={link} />
                         <DeleteLink link={link} />
                     </div>
                 </div>
