@@ -31,14 +31,9 @@ class URLShortnerController extends Controller
 
     public function show(Link $link)
     {
-        $user = Auth::user();
+        abort_unless($link->user_id === Auth::id(), 403);
 
-        $link = Link::where('id', $link->id)
-            ->where('user_id', $user->id)
-            ->withCount('clicks')
-            ->with(['clicks' => fn ($q) => $q->latest()])
-            ->latest()
-            ->firstOrFail();
+        $link->loadCount('clicks')->load(['clicks' => fn ($q) => $q->latest()]);
 
         return inertia('app/links/show', [
             'link' => $link,
@@ -61,6 +56,8 @@ class URLShortnerController extends Controller
 
     public function update(Request $request, Link $link)
     {
+        abort_unless($link->user_id === Auth::id(), 403);
+
         $validated = $request->validate([
             'original_url' => ['required', 'url:http,https', 'max:2048'],
             'code'         => ['nullable', 'string', 'alpha_dash', 'max:32', 'unique:links,code,' . $link->id],
@@ -73,6 +70,8 @@ class URLShortnerController extends Controller
 
     public function destroy(Link $link)
     {
+        abort_unless($link->user_id === Auth::id(), 403);
+
         $link->delete();
 
         return redirect()->route('links')->with('success', 'Short URL deleted.');
