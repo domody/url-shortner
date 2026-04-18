@@ -76,8 +76,7 @@ function CreateLinkDialogContent({ onSuccess }: { onSuccess: () => void }) {
                 <DialogHeader>
                     <DialogTitle>Create short link</DialogTitle>
                     <DialogDescription>
-                        Lorem ipsum dolor, sit amet consectetur adipisicing
-                        elit.
+                        Paste a long URL to generate a short, shareable link.
                     </DialogDescription>
                 </DialogHeader>
                 <FieldGroup>
@@ -104,7 +103,7 @@ function CreateLinkDialogContent({ onSuccess }: { onSuccess: () => void }) {
                         <InputGroup>
                             <InputGroupAddon>
                                 <InputGroupText>
-                                    url-shorter.test/
+                                    {typeof window !== 'undefined' ? window.location.host + '/' : '/'}
                                 </InputGroupText>
                             </InputGroupAddon>
                             <InputGroupInput
