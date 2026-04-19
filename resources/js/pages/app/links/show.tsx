@@ -1,5 +1,4 @@
 import { Head } from '@inertiajs/react';
-import { useMemo } from 'react';
 import {
     ExternalLink,
     Globe,
@@ -44,7 +43,24 @@ import { StatCard } from '@/components/stat-card';
 import { DeleteLink } from '@/components/delete-link';
 import { EditLink } from '@/components/edit-link';
 
-// Reusable empty state
+type ReferrerItem = {
+    source: string;
+    count: number;
+};
+
+type Stats = {
+    clicks_today: number;
+    clicks_this_week: number;
+    last_click: string | null;
+};
+
+type Props = {
+    link: Link;
+    stats: Stats;
+    chartData: Record<string, number>;
+    referrers: ReferrerItem[];
+    recentClicks: Click[];
+};
 
 function EmptyState({
     icon: Icon,
@@ -68,32 +84,10 @@ function EmptyState({
     );
 }
 
-export default function LinkShow({ link }: { link: Link & { clicks: Click[] } }) {
+export default function LinkShow({ link, stats, chartData, referrers, recentClicks }: Props) {
     const shortBase =
         typeof window !== 'undefined' ? window.location.origin + '/' : '';
     const shortUrl = shortBase + link.code;
-
-    const today = new Date().toISOString().split('T')[0];
-    const clicksToday = link.clicks.filter(
-        (c) => new Date(c.created_at).toISOString().split('T')[0] === today,
-    ).length;
-
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
-    const clicksThisWeek = link.clicks.filter(
-        (c) => new Date(c.created_at) >= weekAgo,
-    ).length;
-
-    const lastClick = link.clicks[0] ?? null;
-
-    const referrerBreakdown = useMemo(() => {
-        const counts: Record<string, number> = {};
-        link.clicks.forEach((c) => {
-            const key = formatReferrer(c.referrer);
-            counts[key] = (counts[key] ?? 0) + 1;
-        });
-        return Object.entries(counts).sort((a, b) => b[1] - a[1]);
-    }, [link.clicks]);
 
     return (
         <>
@@ -151,20 +145,20 @@ export default function LinkShow({ link }: { link: Link & { clicks: Click[] } })
                     <StatCard label="Total clicks" value={link.clicks_count} />
                     <StatCard
                         label="Clicks today"
-                        value={clicksToday}
-                        accent={clicksToday > 0 ? 'text-emerald-500' : ''}
+                        value={stats.clicks_today}
+                        accent={stats.clicks_today > 0 ? 'text-emerald-500' : ''}
                     />
-                    <StatCard label="Clicks this week" value={clicksThisWeek} />
+                    <StatCard label="Clicks this week" value={stats.clicks_this_week} />
                     <StatCard
                         label="Last click"
                         value={
-                            lastClick
-                                ? formatRelative(lastClick.created_at)
+                            stats.last_click
+                                ? formatRelative(stats.last_click)
                                 : 'N/A'
                         }
                         sub={
-                            lastClick
-                                ? formatDate(lastClick.created_at)
+                            stats.last_click
+                                ? formatDate(stats.last_click)
                                 : 'No clicks yet'
                         }
                     />
@@ -183,15 +177,14 @@ export default function LinkShow({ link }: { link: Link & { clicks: Click[] } })
                         </div>
                     </CardHeader>
                     <CardContent>
-                        {link.clicks.length === 0 ? (
+                        {link.clicks_count === 0 ? (
                             <EmptyState
                                 icon={MousePointerClickIcon}
                                 title="No clicks yet"
-                                description="Clicks will appear here once your link
-                                        starts getting traffic"
+                                description="Clicks will appear here once your link starts getting traffic"
                             />
                         ) : (
-                            <ActivityChart clicks={link.clicks} />
+                            <ActivityChart chartData={chartData} />
                         )}
                     </CardContent>
                 </Card>
@@ -208,7 +201,7 @@ export default function LinkShow({ link }: { link: Link & { clicks: Click[] } })
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            {referrerBreakdown.length === 0 ? (
+                            {referrers.length === 0 ? (
                                 <EmptyState
                                     icon={Globe}
                                     title="No referrers yet"
@@ -216,60 +209,59 @@ export default function LinkShow({ link }: { link: Link & { clicks: Click[] } })
                                 />
                             ) : (
                                 <div className="no-scrollbar max-h-[400px] space-y-3 overflow-y-auto">
-                                    {referrerBreakdown.map(
-                                        ([source, count]) => {
-                                            const pct =
-                                                link.clicks_count > 0
-                                                    ? Math.round(
-                                                          (count /
-                                                              link.clicks_count) *
-                                                              100,
-                                                      )
-                                                    : 0;
-                                            return (
-                                                <div
-                                                    key={source}
-                                                    className="space-y-1"
-                                                >
-                                                    <div className="flex items-center justify-between text-xs">
-                                                        <span
-                                                            className="max-w-[140px] truncate font-medium"
-                                                            title={source}
-                                                        >
-                                                            {source}
+                                    {referrers.map(({ source, count }) => {
+                                        const pct =
+                                            link.clicks_count > 0
+                                                ? Math.round(
+                                                      (count /
+                                                          link.clicks_count) *
+                                                          100,
+                                                  )
+                                                : 0;
+                                        return (
+                                            <div
+                                                key={source}
+                                                className="space-y-1"
+                                            >
+                                                <div className="flex items-center justify-between text-xs">
+                                                    <span
+                                                        className="max-w-[140px] truncate font-medium"
+                                                        title={source}
+                                                    >
+                                                        {source}
+                                                    </span>
+                                                    <span className="text-muted-foreground tabular-nums">
+                                                        {count}{' '}
+                                                        <span className="opacity-60">
+                                                            ({pct}%)
                                                         </span>
-                                                        <span className="text-muted-foreground tabular-nums">
-                                                            {count}{' '}
-                                                            <span className="opacity-60">
-                                                                ({pct}%)
-                                                            </span>
-                                                        </span>
-                                                    </div>
-                                                    <Progress value={pct} />
+                                                    </span>
                                                 </div>
-                                            );
-                                        },
-                                    )}
+                                                <Progress value={pct} />
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             )}
                         </CardContent>
                     </Card>
 
-                    {/* Clicks */}
+                    {/* Click log */}
                     <Card className="overflow-hidden lg:col-span-2">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-base">
                                 Click log
                             </CardTitle>
                             <CardDescription>
-                                {link.clicks.length} event
-                                {link.clicks.length !== 1 ? 's' : ''}
+                                Latest {recentClicks.length} of{' '}
+                                {link.clicks_count.toLocaleString()} event
+                                {link.clicks_count !== 1 ? 's' : ''}
                             </CardDescription>
                         </CardHeader>
                         <CardContent
-                            className={`h-full ${link.clicks.length === 0 ? '' : 'px-0'}`}
+                            className={`h-full ${recentClicks.length === 0 ? '' : 'px-0'}`}
                         >
-                            {link.clicks.length === 0 ? (
+                            {recentClicks.length === 0 ? (
                                 <EmptyState
                                     icon={Logs}
                                     title="No clicks yet"
@@ -290,7 +282,7 @@ export default function LinkShow({ link }: { link: Link & { clicks: Click[] } })
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {link.clicks.map((click) => {
+                                            {recentClicks.map((click) => {
                                                 const { browser, os } =
                                                     parseUserAgent(
                                                         click.user_agent,

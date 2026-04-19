@@ -14,7 +14,7 @@ const chartConfig = {
     },
 } satisfies ChartConfig;
 
-export function ActivityChart({ clicks }: { clicks: Click[] }) {
+export function ActivityChart({ chartData }: { chartData: Record<string, number> }) {
     const days = useMemo(() => {
         const arr: string[] = [];
         const today = new Date();
@@ -24,19 +24,14 @@ export function ActivityChart({ clicks }: { clicks: Click[] }) {
             d.setDate(d.getDate() - i + 1);
             arr.push(d.toISOString().split('T')[0]);
         }
-        const counts: Record<string, number> = {};
-        clicks.forEach((c) => {
-            const day = new Date(c.created_at).toISOString().split('T')[0];
-            counts[day] = (counts[day] ?? 0) + 1;
-        });
         return arr.map((date) => ({
             date: new Date(date + 'T12:00:00').toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',
             }),
-            count: counts[date] ?? 0,
+            count: chartData[date] ?? 0,
         }));
-    }, [clicks]);
+    }, [chartData]);
 
     return (
         <ChartContainer config={chartConfig} className="h-[300px] w-full">

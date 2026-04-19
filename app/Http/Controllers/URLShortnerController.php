@@ -33,10 +33,49 @@ class URLShortnerController extends Controller
     {
         abort_unless($link->user_id === Auth::id(), 403);
 
-        $link->loadCount('clicks')->load(['clicks' => fn ($q) => $q->latest()]);
+        $link->loadCount('clicks');
+
+        $stats = [
+            'clicks_today'     => $link->clicks()->whereDate('created_at', today())->count(),
+            'clicks_this_week' => $link->clicks()->where('created_at', '>=', now()->subWeek())->count(),
+            'last_click'       => $link->clicks()->latest()->value('created_at'),
+        ];
+
+        $chartData = $link->clicks()
+            ->where('created_at', '>=', now()->subDays(29)->startOfDay())
+            ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+            ->groupByRaw('DATE(created_at)')
+            ->orderBy('date')
+            ->pluck('count', 'date');
+
+        $referrers = $link->clicks()
+            ->select('referrer')
+            ->selectRaw('COUNT(*) as count')
+            ->groupBy('referrer')
+            ->orderByDesc('count')
+            ->get()
+            ->map(fn ($row) => [
+                'source' => $row->referrer
+                    ? preg_replace('/^www\./', '', parse_url($row->referrer, PHP_URL_HOST) ?: $row->referrer)
+                    : 'Direct',
+                'count' => $row->count,
+            ])
+            ->groupBy('source')
+            ->map(fn ($group) => [
+                'source' => $group->first()['source'],
+                'count'  => $group->sum('count'),
+            ])
+            ->sortByDesc('count')
+            ->values();
+
+        $recentClicks = $link->clicks()->latest()->take(50)->get();
 
         return inertia('app/links/show', [
-            'link' => $link,
+            'link'         => $link,
+            'stats'        => $stats,
+            'chartData'    => $chartData,
+            'referrers'    => $referrers,
+            'recentClicks' => $recentClicks,
         ]);
     }
 
