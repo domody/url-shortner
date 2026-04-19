@@ -44,26 +44,6 @@ import { StatCard } from '@/components/stat-card';
 import { DeleteLink } from '@/components/delete-link';
 import { EditLink } from '@/components/edit-link';
 
-type ClickItem = {
-    id: number;
-    link_id: number;
-    ip_address: string | null;
-    referrer: string | null;
-    user_agent: string | null;
-    created_at: string;
-};
-
-type LinkItem = {
-    id: number;
-    user_id: number;
-    original_url: string;
-    code: string;
-    clicks_count: number;
-    clicks: ClickItem[];
-    created_at: string;
-    updated_at: string;
-};
-
 // Reusable empty state
 
 function EmptyState({
@@ -88,9 +68,7 @@ function EmptyState({
     );
 }
 
-// main
-
-export default function LinkShow({ link }: { link: LinkItem }) {
+export default function LinkShow({ link }: { link: Link & { clicks: Click[] } }) {
     const shortBase =
         typeof window !== 'undefined' ? window.location.origin + '/' : '';
     const shortUrl = shortBase + link.code;

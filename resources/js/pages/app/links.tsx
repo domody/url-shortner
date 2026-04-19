@@ -1,12 +1,10 @@
 import { Head, router } from '@inertiajs/react';
-import { useState } from 'react';
 import {
-    Copy,
-    Check,
     ExternalLink,
     LinkIcon,
 } from 'lucide-react';
 import { formatDate } from '@/lib/helpers';
+import { CopyButton } from '@/components/copy-button';
 import { dashboard, links as linksRoute } from '@/routes';
 import {
     Table,
@@ -17,61 +15,6 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-
-type LinkItem = {
-    id: number;
-    user_id: number;
-    original_url: string;
-    code: string;
-    clicks_count: number;
-    created_at: string;
-};
-
-function CopyButton({ text }: { text: string }) {
-    const [copied, setCopied] = useState(false);
-
-    const handleCopy = (e: React.MouseEvent) => {
-        e.stopPropagation();
-
-        if (navigator.clipboard?.writeText) {
-            navigator.clipboard.writeText(text).then(() => {
-                setCopied(true);
-                setTimeout(() => setCopied(false), 1800);
-            });
-        } else {
-            // Fallback for HTTP / older browsers
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            textarea.style.cssText =
-                'position:fixed;opacity:0;pointer-events:none';
-            document.body.appendChild(textarea);
-            textarea.select();
-            try {
-                document.execCommand('copy');
-                setCopied(true);
-                setTimeout(() => setCopied(false), 1800);
-            } finally {
-                document.body.removeChild(textarea);
-            }
-        }
-    };
-
-    return (
-        <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6 shrink-0 opacity-0 transition-opacity group-hover/row:opacity-100"
-            onClick={handleCopy}
-        >
-            {copied ? (
-                <Check className="h-3 w-3 text-emerald-500" />
-            ) : (
-                <Copy className="h-3 w-3" />
-            )}
-        </Button>
-    );
-}
 
 function truncateUrl(url: string, max = 52) {
     try {
@@ -97,8 +40,8 @@ function EmptyState() {
     );
 }
 
-export default function Links({ links }: { links: LinkItem[] }) {
-    const shortBase = typeof window !== "undefined" ?  window.location.origin + '/' : "localhost";
+export default function Links({ links }: { links: Link[] }) {
+    const shortBase = typeof window !== "undefined" ? window.location.origin + '/' : "localhost";
 
     return (
         <>
@@ -148,9 +91,14 @@ export default function Links({ links }: { links: LinkItem[] }) {
                                                 <span className="font-mono text-xs font-medium text-foreground">
                                                     {link.code}
                                                 </span>
-                                                <CopyButton
-                                                    text={shortBase + link.code}
-                                                />
+                                                <div onClick={(e) => e.stopPropagation()}>
+                                                    <CopyButton
+                                                        text={shortBase + link.code}
+                                                        variant="ghost"
+                                                        size="icon-sm"
+                                                        className="opacity-0 transition-opacity group-hover/row:opacity-100"
+                                                    />
+                                                </div>
                                             </div>
                                         </TableCell>
 
@@ -201,7 +149,6 @@ export default function Links({ links }: { links: LinkItem[] }) {
                                                         link.created_at,
                                                     )}
                                                 </span>
-                                                {/* <ArrowUpRight className="h-3 w-3 text-muted-foreground opacity-0 group-hover/row:opacity-100 transition-opacity" /> */}
                                             </div>
                                         </TableCell>
                                     </TableRow>

@@ -7,15 +7,6 @@ import {
 } from '@/components/ui/chart';
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
 
-type ClickItem = {
-    id: number;
-    link_id: number;
-    ip_address: string | null;
-    referrer: string | null;
-    user_agent: string | null;
-    created_at: string;
-};
-
 const chartConfig = {
     count: {
         label: 'Count',
@@ -23,7 +14,7 @@ const chartConfig = {
     },
 } satisfies ChartConfig;
 
-export function ActivityChart({ clicks }: { clicks: ClickItem[] }) {
+export function ActivityChart({ clicks }: { clicks: Click[] }) {
     const days = useMemo(() => {
         const arr: string[] = [];
         const today = new Date();

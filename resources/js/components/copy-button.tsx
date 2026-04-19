@@ -2,7 +2,19 @@ import { useState } from 'react';
 import { Check, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export function CopyButton({ text, label }: { text: string; label?: string }) {
+export function CopyButton({
+    text,
+    label,
+    variant = 'outline',
+    size = 'default',
+    className,
+}: {
+    text: string;
+    label?: string;
+    variant?: 'outline' | 'ghost';
+    size?: 'default' | 'icon' | 'icon-sm';
+    className?: string;
+}) {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = () => {
@@ -29,8 +41,9 @@ export function CopyButton({ text, label }: { text: string; label?: string }) {
 
     return (
         <Button
-            variant="outline"
-            size="default"
+            variant={variant}
+            size={size}
+            className={className}
             onClick={handleCopy}
         >
             {copied ? (
