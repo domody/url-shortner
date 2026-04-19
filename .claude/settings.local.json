@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(\"C:/Users/domin/.config/herd/bin/php.bat\" artisan:*)"
-    ]
-  }
-}
